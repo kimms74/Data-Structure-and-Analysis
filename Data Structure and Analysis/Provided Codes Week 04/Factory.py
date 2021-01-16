@@ -8,7 +8,7 @@ class Factory(ManufacturingProcess):
 
         row = 2
         col = 3
-
+        # initializing 2D list with one line for loop
         self.processes = [[[] for j in range(col)] for i in range(row)]
         for i in range(row):
             for j in range(col):

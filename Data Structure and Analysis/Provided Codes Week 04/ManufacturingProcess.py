@@ -10,7 +10,7 @@ class ManufacturingProcess(Queue, Stack):
 
     def arriveProduct(self, plan):
         # Problem 4. complete the method call to add a product to the waiting line
-        self.??????????????.???????(plan)
+        self.waitingLine.add(plan)
 
     def leaveProduct(self):
         if self.getSize() > 0:
