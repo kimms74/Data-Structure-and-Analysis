@@ -1,1 +1,1 @@
-# algorithm_python_study
+# algorithm_study
