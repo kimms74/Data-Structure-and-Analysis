@@ -30,27 +30,27 @@ class Factory(ManufacturingProcess):
         # Processor = this.col
 
         # Memoization table
-        matShortestCost = np.??????((???????, ??????????))
+        matShortestCost = np.zeros((self.row, self.col))
 
         # Retrace table
-        matPrevLine = np.??????((???????, ??????????))
+        matPrevLine = np.zeros((self.row, self.col))
 
         # initialization of memoization table (the first col)
-        for i in range(??????????):
-            matShortestCost[??][??] = matCost[??][??]
+        for i in range(self.row):
+            matShortestCost[i][0] = matCost[i][0]
 
         # dynamic programming iteration
-        for i in range(1,?????????):
-            for j in range(?????????):
-                if ?????????[0][i - 1] + ?????????[j][i] < ?????????[1][i - 1] + ?????????[j][i]:
-                    ?????????[j][i] = ?????????[0][i - 1] + ?????????[j][i]
-                    ?????????[j][i] = int(0)
+        for i in range(1,self.col): # start with second column
+            for j in range(self.row):
+                if matShortestCost[0][i - 1] + matCost[j][i] < matShortestCost[1][i - 1] + matCost[j][i]:
+                    matShortestCost[j][i] = matShortestCost[0][i - 1] + matCost[j][i]
+                    matPrevLine[j][i] = int(0)
                 else:
-                    ?????????[j][i] = ?????????[1][i - 1] + ?????????[j][i]
-                    ?????????[j][i] = int(1)
+                    matShortestCost[j][i] = matShortestCost[1][i - 1] + matCost[j][i]
+                    matPrevLine[j][i] = int(1)
 
         # choice of line by the dynamic programming
-        if ?????????[0][?????????] < ?????????[1][?????????]:
+        if matShortestCost[0][self.col-1] < matShortestCost[1][self.col-1]: #self.col -1: 0 is first column
             endLine = int(0)
         else:
             endLine = int(1)
@@ -79,7 +79,7 @@ class Factory(ManufacturingProcess):
         cntltr = 0
         while self.completedProduct.getSize() != cntProduct:
             fig = plt.figure()
-            for j in range(self.numStartProduct):
+            for  j in range(self.numStartProduct):
                 product = self.waitingProduct.removeFirst()
                 if product != 'none':
                     line = self.selectLine(self.getCostMatrix())
@@ -87,34 +87,62 @@ class Factory(ManufacturingProcess):
                     print('Product No. : ', product.numNo)
                     self.processes[line][0].arriveProduct(product)
 
-            for jj in range(self.col):
-                j = self.col - jj
+            # #조교가 짠 코드, 왜이렇게 복잡하게 만들었을까
+            # for jj in range(self.col):
+            #     j = self.col - jj
+            #     for i in range(self.row):
+            #         if j == self.col:
+
+            #             plt.text(100 + j * 50, 100, self.completedProduct.getListString(), style='italic')
+            #         else:
+            #             plt.text(100 + j * 50, 50 + i * 100, self.processes[i][j].getListString(), style='italic')
+
+            # for i in range(self.row):
+            #     plt.text(100, 50 + i * 100, self.processes[i][0].getListString(), style='italic')
+
+            #내가 짠 코드
+            for j in range(self.col+1):
                 for i in range(self.row):
                     if j == self.col:
-
                         plt.text(100 + j * 50, 100, self.completedProduct.getListString(), style='italic')
                     else:
                         plt.text(100 + j * 50, 50 + i * 100, self.processes[i][j].getListString(), style='italic')
 
-            for i in range(self.row):
-                plt.text(100, 50 + i * 100, self.processes[i][0].getListString(), style='italic')
+            # #조교가 짠 코드
+            # for jj in range(self.col):
+            #     j = self.col - jj
+            #     for i in range(self.row):
+            #         if self.breakProb > np.random.uniform(0, 1):
+            #             if j == self.col:
+            #                 product = self.processes[i][j - 1].leaveProduct()
+            #                 if product != 'none':
+            #                     self.completedProduct.addLast(product)
+            #             else:
+            #                 product = self.processes[i][j - 1].leaveProduct()
+            #                 if product != 'none':
+            #                     self.processes[i][j].arriveProduct(product)
+            #     if jj == self.col-1:
+            #         print('Process Matrix : ')
+            #         print(self.getCostMatrix())
+            # cntltr += 1
+
+            #내가 짠 코드
+            for j in range(self.col-1,-1,-1):
+                for i in range(self.row):
+                    if self.breakProb > np.random.uniform(0,1):
+                        if j == self.col -1:
+                            product = self.processes[i][j].leaveProduct()
+                            if product != 'none':
+                                self.completedProduct.addLast(product)
+                        else:
+                            product = self.processes[i][j].leaveProduct()
+                            if product != 'none':
+                                self.processes[i][j+1].arriveProduct(product)
+            cntltr += 1
 
             plt.text(50, 100, self.waitingProduct.getListString(), style='italic')
             plt.axis([0, 450, 0, 200])
             plt.show()
-            for jj in range(self.col):
-                j = self.col - jj
-                for i in range(self.row):
-                    if self.breakProb < np.random.uniform(0, 1):
-                        if j == self.col:
-                            product = self.processes[i][j - 1].leaveProduct()
-                            if product != 'none':
-                                self.completedProduct.addLast(product)
-                        else:
-                            product = self.processes[i][j - 1].leaveProduct()
-                            if product != 'none':
-                                self.processes[i][j].arriveProduct(product)
-            cntltr += 1
 
         fig = plt.figure()
         plt.text(100 + self.col * 50, 100, self.completedProduct.getListString(), style='italic')

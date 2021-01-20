@@ -23,7 +23,7 @@ class Factory(ManufacturingProcess):
         while self.completedProduct.getSize() != cntProduct:
             fig = plt.figure()
 
-            for j in range(3,-1, -1):
+            for j in range(3,-1,-1):
                 for i in range(2):
                     if j == 0:
                         product = self.waitingProduct.removeFirst()
