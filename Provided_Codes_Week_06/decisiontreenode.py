@@ -1,6 +1,7 @@
 import csv
 import math
-from voterecord import *
+import os
+from voterecord import Record
 
 class Node:
 
@@ -31,8 +32,8 @@ class Node:
         idxMaxGainFeature = -1
         maxGain = -999999999999999999.0
         for itr in range(len(gains)):
-            if ?????????? < ??????????:
-                ?????????? = ??????????
+            if maxGain < gains[itr]:
+                maxGain = gains[itr]
                 idxMaxGainFeature = itr
 
         for value in Record.values:
@@ -40,15 +41,15 @@ class Node:
             for record in self.records:
                 if record.feature[idxMaxGainFeature] == value:
                     childRecords.append(record)
-            self.children[value] = ??????????(childRecords)
+            self.children[value] = Node(childRecords)
         self.decisionAttribute = idxMaxGainFeature
         return self.children
 
     def calculateInformationGainPerFeatures(self):
         gains = []
-        entropyClass = self.?????
+        entropyClass = self.calculateClassEntropy()
         for itr in range(Record.numValues):
-            entropyConditional = self.?????
+            entropyConditional = self.calculateConditionalEntropy(itr)
             gains.append( entropyClass - entropyConditional )
         return gains
 
@@ -60,8 +61,8 @@ class Node:
                 if record.party == type:
                     cnt = cnt + 1.0
             size = float(len(self.records))
-            prob = float(????? / ?????)
-            entropy = entropy - ????? * math.?????(?????,2)
+            prob = float(cnt / size)
+            entropy = entropy - prob * math.log(prob,2)
         return entropy
 
     def calculateConditionalEntropy(self,idxFeature):
@@ -72,17 +73,19 @@ class Node:
                 cntFeatureAndClass = 0.0
                 for record in self.records:
                     if record.feature[idxFeature] == value:
-                        ????? = ????? + 1
+                        cntFeature = cntFeature + 1
                         if record.party == type:
-                            ????? = ????? + 1.0
+                            cntFeatureAndClass = cntFeatureAndClass + 1.0
                 size = float(len(self.records))
                 probFeature = cntFeature / size + 0.000001
                 probFeatureAndClass = cntFeatureAndClass / size + 0.000001
-                entropy = entropy + ????? * math.log(?????/?????,2)
+                entropy = entropy + probFeatureAndClass * math.log(probFeature/probFeatureAndClass,2)
         return entropy
 
 if __name__ == "__main__":
-    csvfile = open('house-votes-84.csv','rt')
+
+    path = os.path.dirname(os.path.realpath(__file__))
+    csvfile = open(path+'/house-votes-84.csv','rt')
     reader = csv.reader(csvfile,delimiter=',')
     records = []
 
