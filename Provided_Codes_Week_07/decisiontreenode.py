@@ -90,7 +90,8 @@ class Node:
         return entropy
 
 if __name__ == "__main__":
-    csvfile = open('house-votes-84.csv','rt')
+    path = os.path.dirname(os.path.realpath(__file__))
+    csvfile = open(path+'/house-votes-84.csv','rt')
     reader = csv.reader(csvfile,delimiter=',')
     records = []
 
